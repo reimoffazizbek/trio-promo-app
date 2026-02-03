@@ -140,7 +140,7 @@ const handleSubmit = async () => {
 
     statusType.value = 'success'
     statusMessage.value = "Tabriklaymiz! So'rovingiz qabul qilindi."
-    formState.value = createFormState()
+    formState.value.promoCode = '';
   } catch (error) {
     statusType.value = 'error'
     statusMessage.value = "Server bilan bog'lanishda xatolik yuz berdi. Keyinroq urinib ko'ring."
