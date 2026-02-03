@@ -58,7 +58,6 @@ const handleSubmit = async () => {
   try {
     const response = await fetch(endpoint, {
       method: 'POST',
-      mode: 'no-cors',
       headers: {
         'Content-Type': 'application/json',
       },
