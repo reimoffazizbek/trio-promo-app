@@ -55,20 +55,20 @@ const handleSubmit = async () => {
     promoCode: formState.value.promoCode.trim(),
   }
 
-  const formData = new URLSearchParams(payload);
-
   try {
     const response = await fetch(endpoint, {
       method: 'POST',
-      body: formData,
-    })
+      redirect: "follow",
+      headers: {
+        'Content-Type': 'text/plain;charset=utf-8',
+      },
+      body: JSON.stringify(payload)
+    }).then((res) => res.json())
 
-    const result = await response.json().catch(() => null)
-
-    if (!response.ok || !result?.success) {
+    if (!response.success) {
       statusType.value = 'error'
       statusMessage.value =
-        result?.message ?? "Promocode topilmadi yoki avval ishlatilgan. Qayta tekshirib ko'ring."
+        response?.message ?? "Promocode topilmadi yoki avval ishlatilgan. Qayta tekshirib ko'ring."
       return
     }
 
