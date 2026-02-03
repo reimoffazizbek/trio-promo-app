@@ -1,23 +1,90 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
-const formState = ref({
+const PHONE_PREFIX = '+998 '
+
+const createFormState = () => ({
   firstName: '',
   lastName: '',
-  phone: '',
+  phone: PHONE_PREFIX,
   promoCode: '',
 })
+
+const formState = ref(createFormState())
 
 const isSubmitting = ref(false)
 const statusMessage = ref('')
 const statusType = ref<'idle' | 'success' | 'error'>('idle')
 
+const normalizePhone = (value: string) => {
+  let digits = value.replace(/\D/g, '')
+
+  if (digits.startsWith('998')) {
+    digits = digits.slice(3)
+  }
+
+  const local = digits.slice(0, 9)
+  const part1 = local.slice(0, 2)
+  const part2 = local.slice(2, 5)
+  const part3 = local.slice(5, 7)
+  const part4 = local.slice(7, 9)
+
+  let formatted = PHONE_PREFIX
+
+  if (part1) {
+    formatted += `(${part1}`
+  }
+
+  if (part1.length === 2) {
+    formatted += ')'
+  }
+
+  if (part2) {
+    formatted += ` ${part2}`
+  }
+
+  if (part3) {
+    formatted += ` ${part3}`
+  }
+
+  if (part4) {
+    formatted += ` ${part4}`
+  }
+
+  return formatted.trimEnd()
+}
+
+const handlePhoneInput = (event: Event) => {
+  const input = event.target as HTMLInputElement
+  const formatted = normalizePhone(input.value)
+  formState.value.phone = formatted
+
+  if (input.value !== formatted) {
+    input.value = formatted
+  }
+}
+
+const handlePhoneKeydown = (event: KeyboardEvent) => {
+  const input = event.target as HTMLInputElement
+  const selectionStart = input.selectionStart ?? 0
+  const selectionEnd = input.selectionEnd ?? 0
+
+  if (
+    (event.key === 'Backspace' && selectionStart <= PHONE_PREFIX.length && selectionEnd <= PHONE_PREFIX.length) ||
+    (event.key === 'Delete' && selectionStart < PHONE_PREFIX.length)
+  ) {
+    event.preventDefault()
+    input.setSelectionRange(PHONE_PREFIX.length, PHONE_PREFIX.length)
+  }
+}
+
 const isFormValid = computed(() => {
   const { firstName, lastName, phone, promoCode } = formState.value
+  const digitCount = phone.replace(/\D/g, '').length
   return (
     firstName.trim().length > 0 &&
     lastName.trim().length > 0 &&
-    phone.trim().length >= 7 &&
+    digitCount === 12 &&
     promoCode.trim().length === 6
   )
 })
@@ -41,8 +108,7 @@ const handleSubmit = async () => {
 
   if (!endpoint) {
     statusType.value = 'error'
-    statusMessage.value =
-      'Google Sheets uchun server manzili sozlanmagan. VITE_SHEETS_WEBAPP_URL ni kiriting.'
+    statusMessage.value = 'Server manzili sozlanmagan. Administrator bilan bog\'laning.'
     return
   }
 
@@ -58,11 +124,11 @@ const handleSubmit = async () => {
   try {
     const response = await fetch(endpoint, {
       method: 'POST',
-      redirect: "follow",
+      redirect: 'follow',
       headers: {
         'Content-Type': 'text/plain;charset=utf-8',
       },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     }).then((res) => res.json())
 
     if (!response.success) {
@@ -73,14 +139,8 @@ const handleSubmit = async () => {
     }
 
     statusType.value = 'success'
-    statusMessage.value =
-      "Tabriklaymiz! Ro'yxatdan muvaffaqiyatli o'tdingiz."
-    formState.value = {
-      firstName: '',
-      lastName: '',
-      phone: '',
-      promoCode: '',
-    }
+    statusMessage.value = "Tabriklaymiz! So'rovingiz qabul qilindi."
+    formState.value = createFormState()
   } catch (error) {
     statusType.value = 'error'
     statusMessage.value = "Server bilan bog'lanishda xatolik yuz berdi. Keyinroq urinib ko'ring."
@@ -94,11 +154,13 @@ const handleSubmit = async () => {
   <div class="page">
     <main class="card">
       <header class="card__header">
-        <p class="eyebrow">Trio Promo</p>
-        <h1>Aktsiyada ishtirok eting</h1>
-        <p class="subtitle">
-          Promocode kiriting va ishtirokchi bo'ling. Ma'lumotlaringiz Google Sheets bazasida saqlanadi.
-        </p>
+        <img class="logo" src="/logo.svg" alt="Trio Promo" />
+        <div class="header-text">
+          <h1>Aktsiyada ishtirok eting</h1>
+          <p class="subtitle">
+            Promocodeni kiriting va sovg'alar uchun ro'yxatdan o'ting. Ma'lumotlaringiz xavfsiz saqlanadi.
+          </p>
+        </div>
       </header>
 
       <form class="form" @submit.prevent="handleSubmit">
@@ -114,7 +176,15 @@ const handleSubmit = async () => {
 
         <label class="field">
           <span>Telefon raqam</span>
-          <input v-model="formState.phone" type="tel" placeholder="+998 90 123 45 67" autocomplete="tel" />
+          <input
+            v-model="formState.phone"
+            type="tel"
+            inputmode="numeric"
+            placeholder="+998 (90) 123 45 67"
+            autocomplete="tel"
+            @input="handlePhoneInput"
+            @keydown="handlePhoneKeydown"
+          />
         </label>
 
         <label class="field">
@@ -138,12 +208,13 @@ const handleSubmit = async () => {
         {{ statusMessage }}
       </p>
 
-      <div class="tips">
-        <p>
-          Promocodelar faqat bir marta ishlatiladi. Agar promocode ishlamasa, u avval aktiv bo'lmagan
-          bo'lishi mumkin.
-        </p>
-        <p>Server manzilini sozlash uchun <code>.env</code> faylida VITE_SHEETS_WEBAPP_URL ni kiriting.</p>
+      <div class="contact">
+        <h2>Biz bilan bog'laning</h2>
+        <p>Savol yoki xatolik bo'lsa, tezkor yordam uchun yozing.</p>
+        <div class="contact__items">
+          <a class="contact__item" href="https://t.me/triopromo_support" target="_blank" rel="noopener">@triopromo_support</a>
+          <a class="contact__item" href="tel:+998901234567">+998 90 123 45 67</a>
+        </div>
       </div>
     </main>
   </div>
@@ -155,34 +226,44 @@ const handleSubmit = async () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 32px 16px;
+  padding: 40px 16px;
 }
 
 .card {
-  width: min(520px, 100%);
-  background: #ffffff;
-  border-radius: 24px;
-  padding: 32px;
-  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.12);
+  width: min(560px, 100%);
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 28px;
+  padding: 36px;
+  box-shadow: 0 32px 80px rgba(79, 70, 229, 0.18);
   display: grid;
   gap: 24px;
+  border: 1px solid rgba(79, 70, 229, 0.12);
+  backdrop-filter: blur(12px);
 }
 
 .card__header {
   display: grid;
-  gap: 12px;
+  gap: 18px;
 }
 
-.eyebrow {
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.2em;
-  color: #64748b;
-  font-weight: 600;
+.logo {
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+}
+
+.header-text {
+  display: grid;
+  gap: 10px;
+}
+
+h1 {
+  font-size: 28px;
+  color: #111827;
 }
 
 .subtitle {
-  color: #475569;
+  color: #4b5563;
   line-height: 1.6;
 }
 
@@ -200,23 +281,25 @@ const handleSubmit = async () => {
 
 .field input {
   padding: 12px 14px;
-  border-radius: 12px;
+  border-radius: 14px;
   border: 1px solid #e2e8f0;
   font-size: 15px;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  background: #f8fafc;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
 
 .field input:focus {
   outline: none;
-  border-color: #6366f1;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+  background: #ffffff;
 }
 
 .button {
   padding: 14px 16px;
-  border-radius: 12px;
+  border-radius: 14px;
   border: none;
-  background: #4f46e5;
+  background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
   color: #fff;
   font-size: 16px;
   font-weight: 600;
@@ -232,7 +315,7 @@ const handleSubmit = async () => {
 
 .button:not(:disabled):hover {
   transform: translateY(-1px);
-  box-shadow: 0 12px 24px rgba(79, 70, 229, 0.3);
+  box-shadow: 0 14px 30px rgba(79, 70, 229, 0.28);
 }
 
 .status {
@@ -251,18 +334,57 @@ const handleSubmit = async () => {
   color: #b42318;
 }
 
-.tips {
-  font-size: 13px;
-  color: #64748b;
-  line-height: 1.6;
+.contact {
   display: grid;
-  gap: 8px;
+  gap: 10px;
+  padding: 16px;
+  border-radius: 18px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
 }
 
-.tips code {
-  background: #f1f5f9;
-  padding: 2px 6px;
-  border-radius: 6px;
-  font-size: 12px;
+.contact h2 {
+  font-size: 16px;
+  color: #111827;
+}
+
+.contact p {
+  font-size: 14px;
+  color: #64748b;
+}
+
+.contact__items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.contact__item {
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: #eef2ff;
+  color: #4338ca;
+  font-weight: 600;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.contact__item:hover {
+  background: #e0e7ff;
+}
+
+@media (max-width: 520px) {
+  .card {
+    padding: 28px 22px;
+  }
+
+  .logo {
+    width: 64px;
+    height: 64px;
+  }
+
+  h1 {
+    font-size: 24px;
+  }
 }
 </style>
