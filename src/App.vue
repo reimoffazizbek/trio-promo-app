@@ -212,8 +212,8 @@ const handleSubmit = async () => {
         <h2>Biz bilan bog'laning</h2>
         <p>Savol yoki xatolik bo'lsa, tezkor yordam uchun yozing.</p>
         <div class="contact__items">
-          <a class="contact__item" href="https://t.me/triopromo_support" target="_blank" rel="noopener">@triopromo_support</a>
-          <a class="contact__item" href="tel:+998901234567">+998 90 123 45 67</a>
+          <a class="contact__item" href="https://t.me/reimoffazizbek" target="_blank" rel="noopener">@reimoffazizbek</a>
+          <a class="contact__item" href="tel:+998904217300">+998 90 421 73 00</a>
         </div>
       </div>
     </main>
