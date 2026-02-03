@@ -55,13 +55,12 @@ const handleSubmit = async () => {
     promoCode: formState.value.promoCode.trim(),
   }
 
+  const formData = new URLSearchParams(payload);
+
   try {
     const response = await fetch(endpoint, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
+      body: formData,
     })
 
     const result = await response.json().catch(() => null)
