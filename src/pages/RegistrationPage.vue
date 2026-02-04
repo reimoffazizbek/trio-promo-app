@@ -141,6 +141,16 @@ const handleSubmit = async () => {
         </div>
       </header>
 
+      <section class="promo-link">
+        <div>
+          <h2>Aktsiyadagi mahsulotlarni ko'ring</h2>
+          <p>Chegirmadagi mahsulotlar, foizlar va amal qilish muddatlari bilan tanishing.</p>
+        </div>
+        <router-link class="promo-link__button" to="/discounts">
+          Aktsiyalar sahifasi
+        </router-link>
+      </section>
+
       <form class="form" @submit.prevent="handleSubmit">
         <label class="field">
           <span>Ism</span>
@@ -243,6 +253,46 @@ h1 {
 .form {
   display: grid;
   gap: 16px;
+}
+
+.promo-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, rgba(79, 70, 229, 0.1), rgba(129, 140, 248, 0.15));
+  border: 1px solid rgba(79, 70, 229, 0.18);
+}
+
+.promo-link h2 {
+  font-size: 18px;
+  color: #1e1b4b;
+}
+
+.promo-link p {
+  margin-top: 6px;
+  color: #475569;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.promo-link__button {
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #4338ca;
+  font-weight: 700;
+  text-decoration: none;
+  border: 1px solid rgba(79, 70, 229, 0.3);
+  white-space: nowrap;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.promo-link__button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px rgba(79, 70, 229, 0.2);
 }
 
 .field {
@@ -349,6 +399,11 @@ h1 {
 @media (max-width: 520px) {
   .card {
     padding: 28px 22px;
+  }
+
+  .promo-link {
+    flex-direction: column;
+    align-items: flex-start;
   }
 
   .logo {
