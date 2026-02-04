@@ -1,36 +1,80 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { authService } from '../services/authService'
+import { participantService } from '../services/participantService'
 import ServiceLayout from '../components/ServiceLayout.vue'
+import type { ParticipantItem } from '../types/api'
 
 const router = useRouter()
 
-const participants = [
-  { name: 'Aziza Karimova', phone: '+998 90 123 45 67', promoCode: 'TRIO001', registrations: 2 },
-  { name: 'Kamron Raxmonov', phone: '+998 91 234 56 78', promoCode: 'TRIO014', registrations: 1 },
-  { name: 'Madina Nematova', phone: '+998 93 345 67 89', promoCode: 'TRIO027', registrations: 3 },
-  { name: 'Shohruh Xasanov', phone: '+998 94 456 78 90', promoCode: 'TRIO042', registrations: 1 },
-  { name: 'Nargiza Usmonova', phone: '+998 95 567 89 01', promoCode: 'TRIO050', registrations: 2 },
-  { name: 'Farruh Qodirov', phone: '+998 90 678 90 12', promoCode: 'TRIO061', registrations: 1 },
-  { name: 'Lola Otabekova', phone: '+998 91 789 01 23', promoCode: 'TRIO073', registrations: 4 },
-  { name: 'Sardor Ismoilov', phone: '+998 93 890 12 34', promoCode: 'TRIO085', registrations: 2 },
-  { name: 'Dilnoza Muminova', phone: '+998 94 901 23 45', promoCode: 'TRIO092', registrations: 1 },
-  { name: 'Javohir Toirov', phone: '+998 95 112 23 34', promoCode: 'TRIO099', registrations: 2 },
-  { name: 'Feruza Ibragimova', phone: '+998 90 223 34 45', promoCode: 'TRIO108', registrations: 1 },
-  { name: 'Bekzod Eshonov', phone: '+998 91 334 45 56', promoCode: 'TRIO115', registrations: 3 },
-]
+const participants = ref<ParticipantItem[]>([])
+const totalRegistrations = ref(0)
+const participantCount = ref(0)
+const totalPages = ref(1)
+const totalElements = ref(0)
+const pageSize = 10
+const currentPage = ref(1)
+const searchTerm = ref('')
+const isLoading = ref(false)
+let searchTimeout: ReturnType<typeof setTimeout> | null = null
 
-const totalRegistrations = computed(() =>
-  participants.reduce((total, participant) => total + participant.registrations, 0),
-)
+const fetchStats = async () => {
+  const response = await participantService.getStats()
+  totalRegistrations.value = response.data.totalRegistration
+  participantCount.value = response.data.totalParticipant
+}
 
-const participantCount = computed(() => participants.length)
+const fetchParticipants = async () => {
+  isLoading.value = true
+  try {
+    const response = await participantService.findAll({
+      page: currentPage.value - 1,
+      size: pageSize,
+      search: searchTerm.value.trim() || undefined,
+    })
+    participants.value = response.data.content
+    totalPages.value = Math.max(response.data.totalPages, 1)
+    totalElements.value = response.data.totalElements
+  } finally {
+    isLoading.value = false
+  }
+}
+
+const goToPage = (page: number) => {
+  const nextPage = Math.min(Math.max(page, 1), totalPages.value)
+  currentPage.value = nextPage
+}
 
 const handleLogout = async () => {
   authService.clearSession()
   await router.push('/service/login')
 }
+
+watch(currentPage, () => {
+  void fetchParticipants()
+})
+
+watch(searchTerm, () => {
+  if (searchTimeout) {
+    clearTimeout(searchTimeout)
+  }
+  searchTimeout = setTimeout(() => {
+    currentPage.value = 1
+    void fetchParticipants()
+  }, 1200)
+})
+
+onMounted(() => {
+  void fetchStats()
+  void fetchParticipants()
+})
+
+onBeforeUnmount(() => {
+  if (searchTimeout) {
+    clearTimeout(searchTimeout)
+  }
+})
 </script>
 
 <template>
@@ -62,6 +106,10 @@ const handleLogout = async () => {
           <h2>Ishtirokchilar jadvali</h2>
           <p class="panel__subtitle">Promokod bilan ro'yxatdan o'tganlar ro'yxati.</p>
         </div>
+        <div class="panel__actions">
+          <input v-model="searchTerm" class="search-input" type="search" placeholder="Ishtirokchi qidiring..." />
+          <span class="badge">Jami: {{ totalElements }}</span>
+        </div>
       </div>
 
       <div class="table-wrapper">
@@ -75,14 +123,39 @@ const handleLogout = async () => {
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(participant, index) in participants" :key="participant.phone">
-              <td>{{ index + 1 }}</td>
-              <td>{{ participant.name }}</td>
-              <td>{{ participant.phone }}</td>
-              <td class="code">{{ participant.promoCode }}</td>
+            <tr v-if="isLoading">
+              <td colspan="4">Ma'lumotlar yuklanmoqda...</td>
             </tr>
+            <tr v-else-if="participants.length === 0">
+              <td colspan="4">Ishtirokchilar topilmadi.</td>
+            </tr>
+            <template v-else>
+              <tr v-for="(participant, index) in participants" :key="participant.id">
+                <td>{{ (currentPage - 1) * pageSize + index + 1 }}</td>
+                <td>{{ participant.fullName }}</td>
+                <td>{{ participant.phoneNumber }}</td>
+                <td class="code">{{ participant.promoCode }}</td>
+              </tr>
+            </template>
           </tbody>
         </table>
+      </div>
+
+      <div class="pagination">
+        <button class="pagination__button" type="button" :disabled="currentPage === 1" @click="goToPage(currentPage - 1)">
+          Oldingi
+        </button>
+        <div class="pagination__info">
+          <span>Sahifa {{ currentPage }} / {{ totalPages }}</span>
+        </div>
+        <button
+          class="pagination__button"
+          type="button"
+          :disabled="currentPage === totalPages"
+          @click="goToPage(currentPage + 1)"
+        >
+          Keyingi
+        </button>
       </div>
     </section>
   </ServiceLayout>
@@ -137,6 +210,38 @@ const handleLogout = async () => {
   color: #0f172a;
 }
 
+.panel__header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.panel__actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.search-input {
+  border: 1px solid #e2e8f0;
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-size: 14px;
+  min-width: 220px;
+}
+
+.badge {
+  background: #eef2ff;
+  color: #4338ca;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 13px;
+}
+
 .panel__subtitle {
   color: #64748b;
   font-size: 14px;
@@ -172,6 +277,33 @@ tbody tr {
 .code {
   font-weight: 600;
   color: #4338ca;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.pagination__button {
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.pagination__button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination__info {
+  color: #475569;
+  font-weight: 600;
 }
 
 .ghost-button {

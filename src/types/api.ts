@@ -47,3 +47,38 @@ export type PromoRegistrationResult = {
   id?: number
   status?: string
 }
+
+export type PromoStats = {
+  totalActivePromoCodes: number
+  totalUsedPromoCodes: number
+}
+
+export type PromoCodeItem = {
+  id: number
+  code: string
+  used: boolean
+}
+
+export type ParticipantStats = {
+  totalRegistration: number
+  totalParticipant: number
+}
+
+export type ParticipantItem = {
+  id: number
+  fullName: string
+  phoneNumber: string
+  promoCode: string
+}
+
+export type PagedResponse<T> = {
+  totalPages: number
+  totalElements: number
+  size: number
+  content: T[]
+  number: number
+  first: boolean
+  last: boolean
+  numberOfElements: number
+  empty: boolean
+}
