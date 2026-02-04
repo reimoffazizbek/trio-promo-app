@@ -1,31 +1,47 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { authService } from '../services/authService'
+import { promoService } from '../services/promoService'
 import ServiceLayout from '../components/ServiceLayout.vue'
+import type { PromoCodeItem } from '../types/api'
 
 const router = useRouter()
 
-const promoCodes = Array.from({ length: 132 }, (_, index) => {
-  const codeNumber = String(index + 1).padStart(3, '0')
-  return {
-    code: `TRIO${codeNumber}`,
-    used: index % 3 === 0,
-  }
-})
-
+const promoCodes = ref<PromoCodeItem[]>([])
+const totalPages = ref(1)
+const totalElements = ref(0)
 const pageSize = 100
 const currentPage = ref(1)
+const searchTerm = ref('')
+const isLoading = ref(false)
+const activeCount = ref(0)
+const usedCount = ref(0)
 
-const totalPages = computed(() => Math.ceil(promoCodes.length / pageSize))
+const paginatedCodes = computed(() => promoCodes.value)
+let searchTimeout: ReturnType<typeof setTimeout> | null = null
 
-const paginatedCodes = computed(() => {
-  const start = (currentPage.value - 1) * pageSize
-  return promoCodes.slice(start, start + pageSize)
-})
+const fetchStats = async () => {
+  const response = await promoService.getStats()
+  activeCount.value = response.data.totalActivePromoCodes
+  usedCount.value = response.data.totalUsedPromoCodes
+}
 
-const activeCount = computed(() => promoCodes.filter((code) => !code.used).length)
-const usedCount = computed(() => promoCodes.filter((code) => code.used).length)
+const fetchPromoCodes = async () => {
+  isLoading.value = true
+  try {
+    const response = await promoService.findAll({
+      page: currentPage.value - 1,
+      size: pageSize,
+      search: searchTerm.value.trim() || undefined,
+    })
+    promoCodes.value = response.data.content
+    totalPages.value = Math.max(response.data.totalPages, 1)
+    totalElements.value = response.data.totalElements
+  } finally {
+    isLoading.value = false
+  }
+}
 
 const goToPage = (page: number) => {
   const nextPage = Math.min(Math.max(page, 1), totalPages.value)
@@ -36,6 +52,31 @@ const handleLogout = async () => {
   authService.clearSession()
   await router.push('/service/login')
 }
+
+watch(currentPage, () => {
+  void fetchPromoCodes()
+})
+
+watch(searchTerm, () => {
+  if (searchTimeout) {
+    clearTimeout(searchTimeout)
+  }
+  searchTimeout = setTimeout(() => {
+    currentPage.value = 1
+    void fetchPromoCodes()
+  }, 1200)
+})
+
+onMounted(() => {
+  void fetchStats()
+  void fetchPromoCodes()
+})
+
+onBeforeUnmount(() => {
+  if (searchTimeout) {
+    clearTimeout(searchTimeout)
+  }
+})
 </script>
 
 <template>
@@ -68,7 +109,8 @@ const handleLogout = async () => {
           <p class="panel__subtitle">Sahifa o'lchami: {{ pageSize }}</p>
         </div>
         <div class="panel__actions">
-          <span class="badge">Jami: {{ promoCodes.length }}</span>
+          <input v-model="searchTerm" class="search-input" type="search" placeholder="Promokod qidiring..." />
+          <span class="badge">Jami: {{ totalElements }}</span>
         </div>
       </div>
 
@@ -82,15 +124,23 @@ const handleLogout = async () => {
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(promo, index) in paginatedCodes" :key="promo.code">
-              <td>{{ (currentPage - 1) * pageSize + index + 1 }}</td>
-              <td class="code">{{ promo.code }}</td>
-              <td>
-                <span class="status" :class="promo.used ? 'status--used' : 'status--active'">
-                  {{ promo.used ? "Ha" : "Yo'q" }}
-                </span>
-              </td>
+            <tr v-if="isLoading">
+              <td colspan="3">Ma'lumotlar yuklanmoqda...</td>
             </tr>
+            <tr v-else-if="paginatedCodes.length === 0">
+              <td colspan="3">Promokodlar topilmadi.</td>
+            </tr>
+            <template v-else>
+              <tr v-for="(promo, index) in paginatedCodes" :key="promo.id">
+                <td>{{ (currentPage - 1) * pageSize + index + 1 }}</td>
+                <td class="code">{{ promo.code }}</td>
+                <td>
+                  <span class="status" :class="promo.used ? 'status--used' : 'status--active'">
+                    {{ promo.used ? "Ha" : "Yo'q" }}
+                  </span>
+                </td>
+              </tr>
+            </template>
           </tbody>
         </table>
       </div>
@@ -185,6 +235,21 @@ const handleLogout = async () => {
   border-radius: 999px;
   font-weight: 600;
   font-size: 13px;
+}
+
+.panel__actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.search-input {
+  border: 1px solid #e2e8f0;
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-size: 14px;
+  min-width: 220px;
 }
 
 .table-wrapper {
