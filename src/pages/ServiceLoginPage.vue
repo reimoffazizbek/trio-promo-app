@@ -57,6 +57,46 @@ const normalizePhone = (value: string) => {
   return formatted.trimEnd()
 }
 
+const countDigitsBefore = (value: string, position: number) => {
+  let count = 0
+  for (let i = 0; i < position; i += 1) {
+    if (/\d/.test(value[i])) {
+      count += 1
+    }
+  }
+  return count
+}
+
+const getLocalDigits = (value: string) => {
+  let digits = value.replace(/\D/g, '')
+
+  if (digits.startsWith('998')) {
+    digits = digits.slice(3)
+  }
+
+  return digits
+}
+
+const getCaretPositionForLocalIndex = (value: string, localIndex: number) => {
+  if (localIndex <= 0) {
+    return PHONE_PREFIX.length
+  }
+
+  const targetDigitCount = 3 + localIndex
+  let count = 0
+
+  for (let i = 0; i < value.length; i += 1) {
+    if (/\d/.test(value[i])) {
+      count += 1
+      if (count === targetDigitCount) {
+        return i + 1
+      }
+    }
+  }
+
+  return value.length
+}
+
 const handlePhoneInput = (event: Event) => {
   const input = event.target as HTMLInputElement
   const formatted = normalizePhone(input.value)
@@ -78,6 +118,35 @@ const handlePhoneKeydown = (event: KeyboardEvent) => {
   ) {
     event.preventDefault()
     input.setSelectionRange(PHONE_PREFIX.length, PHONE_PREFIX.length)
+  }
+
+  if (selectionStart !== selectionEnd || (event.key !== 'Backspace' && event.key !== 'Delete')) {
+    return
+  }
+
+  const value = input.value
+  const isBackspace = event.key === 'Backspace'
+  const charBefore = value[selectionStart - 1]
+  const charAfter = value[selectionStart]
+  const isFormattingChar = (char?: string) => Boolean(char && /\D/.test(char))
+
+  if ((isBackspace && isFormattingChar(charBefore)) || (!isBackspace && isFormattingChar(charAfter))) {
+    event.preventDefault()
+
+    const localDigits = getLocalDigits(value).split('')
+    const digitsBeforeCursor = Math.max(0, countDigitsBefore(value, selectionStart) - 3)
+    const removeIndex = isBackspace ? digitsBeforeCursor - 1 : digitsBeforeCursor
+
+    if (removeIndex >= 0 && removeIndex < localDigits.length) {
+      localDigits.splice(removeIndex, 1)
+    }
+
+    const formatted = normalizePhone(localDigits.join(''))
+    formState.value.phone = formatted
+    input.value = formatted
+
+    const caretIndex = getCaretPositionForLocalIndex(formatted, Math.max(removeIndex, 0))
+    input.setSelectionRange(caretIndex, caretIndex)
   }
 }
 
