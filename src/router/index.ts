@@ -4,6 +4,7 @@ import DiscountsPage from '../pages/DiscountsPage.vue'
 import ServiceLoginPage from '../pages/ServiceLoginPage.vue'
 import ServiceDashboardPage from '../pages/ServiceDashboardPage.vue'
 import ServicePromocodesPage from '../pages/ServicePromocodesPage.vue'
+import ServiceParticipantsPage from '../pages/ServiceParticipantsPage.vue'
 import { useAuthStore } from '../stores/auth'
 
 const router = createRouter({
@@ -39,6 +40,14 @@ const router = createRouter({
       path: '/service/promocodes',
       name: 'service-promocodes',
       component: ServicePromocodesPage,
+      meta: {
+        requiresAuth: true,
+      },
+    },
+    {
+      path: '/service/participants',
+      name: 'service-participants',
+      component: ServiceParticipantsPage,
       meta: {
         requiresAuth: true,
       },

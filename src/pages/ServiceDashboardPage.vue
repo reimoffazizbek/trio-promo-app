@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { authService } from '../services/authService'
 import { useAuthStore } from '../stores/auth'
+import ServiceLayout from '../components/ServiceLayout.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -15,6 +16,27 @@ const userName = computed(() => {
   return [user.firstName, user.lastName].filter(Boolean).join(' ') || user.phoneNumber || 'Admin'
 })
 
+const topParticipants = [
+  { name: 'Azizbek Karimov', phone: '+998 90 123 45 67', registrations: 12 },
+  { name: 'Dilnoza Ahmedova', phone: '+998 91 234 56 78', registrations: 10 },
+  { name: 'Bekzod Rustamov', phone: '+998 93 345 67 89', registrations: 9 },
+  { name: 'Madina Islomova', phone: '+998 94 456 78 90', registrations: 8 },
+  { name: 'Javohir Xasanov', phone: '+998 95 567 89 01', registrations: 7 },
+]
+
+const latestParticipants = [
+  { name: 'Umida Abdullayeva', phone: '+998 90 321 45 67', date: '2024-06-14 10:12' },
+  { name: 'Sherzod Qodirov', phone: '+998 91 654 32 10', date: '2024-06-14 09:40' },
+  { name: 'Nodira Usmonova', phone: '+998 93 111 22 33', date: '2024-06-14 09:10' },
+  { name: 'Farruh Xasanov', phone: '+998 94 222 33 44', date: '2024-06-14 08:55' },
+  { name: 'Kamola Rustamova', phone: '+998 95 333 44 55', date: '2024-06-14 08:20' },
+  { name: 'Yusuf Karimov', phone: '+998 90 444 55 66', date: '2024-06-14 08:05' },
+  { name: 'Lola Tursunova', phone: '+998 91 555 66 77', date: '2024-06-14 07:40' },
+  { name: 'Akmal Mirzayev', phone: '+998 93 666 77 88', date: '2024-06-14 07:15' },
+  { name: 'Nigora Shavkatova', phone: '+998 94 777 88 99', date: '2024-06-14 06:50' },
+  { name: 'Sardor Usmonov', phone: '+998 95 888 99 00', date: '2024-06-14 06:25' },
+]
+
 const handleLogout = async () => {
   authService.clearSession()
   await router.push('/service/login')
@@ -22,82 +44,136 @@ const handleLogout = async () => {
 </script>
 
 <template>
-  <div class="page">
-    <header class="header">
-      <div>
-        <p class="eyebrow">Admin panel</p>
-        <h1>Xush kelibsiz, {{ userName }}</h1>
-        <p class="subtitle">Promokodlar bo'limini boshqarish uchun kerakli menyuni tanlang.</p>
-      </div>
-      <div class="actions">
-        <router-link class="secondary-button" to="/service/promocodes">Promokodlar</router-link>
-        <button class="ghost-button" type="button" @click="handleLogout">Chiqish</button>
-      </div>
-    </header>
+  <ServiceLayout
+    eyebrow="Dashboard"
+    :title="`Xush kelibsiz, ${userName}`"
+    subtitle="Admin paneldagi umumiy holat va so'nggi faollikni kuzating."
+  >
+    <template #actions>
+      <button class="ghost-button" type="button" @click="handleLogout">Chiqish</button>
+    </template>
 
-    <section class="cards">
-      <article class="card">
-        <h2>Promokodlar</h2>
-        <p>Ro'yxatni ko'rish va faollikni tekshirish uchun promokodlar sahifasiga o'ting.</p>
-        <router-link class="primary-button" to="/service/promocodes">Promokodlarni ochish</router-link>
+    <section class="dashboard-grid">
+      <article class="panel">
+        <div class="panel__header">
+          <div>
+            <h2>Top ro'yxatdan o'tgan ishtirokchilar</h2>
+            <p class="panel__subtitle">Eng ko'p ro'yxatdan o'tgan ishtirokchilar reytingi.</p>
+          </div>
+        </div>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Ism</th>
+                <th>Telefon raqam</th>
+                <th>Ro'yxatdan o'tish soni</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(participant, index) in topParticipants" :key="participant.phone">
+                <td>{{ index + 1 }}</td>
+                <td>{{ participant.name }}</td>
+                <td>{{ participant.phone }}</td>
+                <td class="highlight">{{ participant.registrations }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </article>
-      <article class="card card--muted">
-        <h2>Foydalanuvchi arizalari</h2>
-        <p>Bu yerda yangi arizalar va statuslar ko'rsatiladi. (Keyingi bosqich)</p>
+
+      <article class="panel">
+        <div class="panel__header">
+          <div>
+            <h2>Oxirgi 10 ta ro'yxatdan o'tgan ishtirokchilar</h2>
+            <p class="panel__subtitle">Oxirgi kelib tushgan arizalar ro'yxati.</p>
+          </div>
+        </div>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Ism</th>
+                <th>Telefon raqam</th>
+                <th>Ro'yxatdan o'tgan vaqt</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(participant, index) in latestParticipants" :key="participant.phone">
+                <td>{{ index + 1 }}</td>
+                <td>{{ participant.name }}</td>
+                <td>{{ participant.phone }}</td>
+                <td>{{ participant.date }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </article>
     </section>
-  </div>
+  </ServiceLayout>
 </template>
 
 <style scoped>
-.page {
-  min-height: 100vh;
-  padding: 48px 32px;
+.dashboard-grid {
   display: grid;
-  gap: 32px;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
 }
 
-.header {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 24px;
-  justify-content: space-between;
-  align-items: center;
+.panel {
   background: #ffffff;
-  padding: 24px 28px;
-  border-radius: 24px;
-  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.08);
-  border: 1px solid rgba(79, 70, 229, 0.12);
+  border-radius: 20px;
+  padding: 20px;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.06);
+  display: grid;
+  gap: 16px;
 }
 
-.eyebrow {
-  font-size: 14px;
-  font-weight: 700;
-  color: #4338ca;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-
-h1 {
-  font-size: 28px;
-  margin: 6px 0;
+.panel__header h2 {
+  font-size: 18px;
   color: #0f172a;
 }
 
-.subtitle {
+.panel__subtitle {
+  color: #64748b;
+  font-size: 14px;
+  margin-top: 4px;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+th,
+ td {
+  text-align: left;
+  padding: 10px 12px;
+}
+
+th {
+  background: #f1f5f9;
   color: #475569;
-  line-height: 1.6;
-  max-width: 520px;
+  font-weight: 600;
 }
 
-.actions {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
+tbody tr {
+  border-bottom: 1px solid #e2e8f0;
 }
 
-.primary-button,
-.secondary-button,
+.highlight {
+  font-weight: 700;
+  color: #4f46e5;
+}
+
 .ghost-button {
   padding: 10px 18px;
   border-radius: 999px;
@@ -105,70 +181,13 @@ h1 {
   text-decoration: none;
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.primary-button {
-  background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
-  color: #fff;
-  display: inline-flex;
-}
-
-.secondary-button {
-  background: #eef2ff;
-  color: #4338ca;
-  border: 1px solid rgba(79, 70, 229, 0.3);
-}
-
-.ghost-button {
   background: transparent;
   border: 1px solid #e2e8f0;
   color: #475569;
 }
 
-.primary-button:hover,
-.secondary-button:hover,
 .ghost-button:hover {
   transform: translateY(-1px);
   box-shadow: 0 10px 22px rgba(15, 23, 42, 0.12);
-}
-
-.cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 20px;
-}
-
-.card {
-  background: #ffffff;
-  border-radius: 20px;
-  padding: 22px;
-  border: 1px solid rgba(148, 163, 184, 0.35);
-  display: grid;
-  gap: 12px;
-  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.06);
-}
-
-.card h2 {
-  font-size: 18px;
-  color: #0f172a;
-}
-
-.card p {
-  color: #64748b;
-  line-height: 1.6;
-}
-
-.card--muted {
-  background: #f8fafc;
-}
-
-@media (max-width: 640px) {
-  .page {
-    padding: 32px 20px;
-  }
-
-  .header {
-    padding: 20px;
-  }
 }
 </style>
