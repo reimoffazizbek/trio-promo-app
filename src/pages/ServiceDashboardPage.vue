@@ -6,7 +6,7 @@ import { participantService } from '../services/participantService'
 import { useAuthStore } from '../stores/auth'
 import ServiceLayout from '../components/ServiceLayout.vue'
 import type { ParticipantItem, TopParticipant } from '../types/api'
-import {formatDate} from "@/services/GlobalVar.ts";
+import {formatDate} from "../services/GlobalVar.ts";
 
 const router = useRouter()
 const authStore = useAuthStore()

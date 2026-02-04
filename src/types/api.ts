@@ -37,9 +37,8 @@ export type AuthPayload = {
 export type AuthResponse = ApiResponse<AuthPayload>
 
 export type PromoRegistrationPayload = {
-  firstName: string
-  lastName: string
-  phoneNumber: string
+  fullName: string
+  phone: string
   promoCode: string
 }
 
