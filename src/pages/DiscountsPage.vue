@@ -4,38 +4,38 @@ import { ref } from 'vue'
 const products = [
   {
     id: 1,
-    name: 'Trio Smart Watch Pro',
-    image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=900&q=80',
-    originalPrice: 1299000,
-    discountPercent: 25,
-    discountedPrice: 974250,
+    name: 'Coca-Cola 1.5L',
+    image: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&w=900&q=80',
+    originalPrice: 18500,
+    discountPercent: 20,
+    discountedPrice: 14800,
     validUntil: '30-sentabr',
   },
   {
     id: 2,
-    name: 'Trio Wireless Earbuds Air',
-    image: 'https://images.unsplash.com/photo-1518441315132-169ae0053145?auto=format&fit=crop&w=900&q=80',
-    originalPrice: 899000,
-    discountPercent: 30,
-    discountedPrice: 629300,
-    validUntil: '25-sentabr',
+    name: 'Kungaboqar yog‘i 1L',
+    image: 'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?auto=format&fit=crop&w=900&q=80',
+    originalPrice: 42000,
+    discountPercent: 15,
+    discountedPrice: 35700,
+    validUntil: '28-sentabr',
   },
   {
     id: 3,
-    name: 'Trio Power Bank Ultra',
-    image: 'https://images.unsplash.com/photo-1618517048289-4646902edaf5?auto=format&fit=crop&w=900&q=80',
-    originalPrice: 459000,
-    discountPercent: 20,
-    discountedPrice: 367200,
+    name: 'Guruch 5 kg',
+    image: 'https://images.unsplash.com/photo-1518131672697-613becd4fab5?auto=format&fit=crop&w=900&q=80',
+    originalPrice: 98000,
+    discountPercent: 25,
+    discountedPrice: 73500,
     validUntil: '18-sentabr',
   },
   {
     id: 4,
-    name: 'Trio Home Speaker Max',
-    image: 'https://images.unsplash.com/photo-1511367461989-f85a21fda167?auto=format&fit=crop&w=900&q=80',
-    originalPrice: 1499000,
-    discountPercent: 35,
-    discountedPrice: 974350,
+    name: 'Choy Assorti 200 g',
+    image: 'https://images.unsplash.com/photo-1485808191679-5f86510681a2?auto=format&fit=crop&w=900&q=80',
+    originalPrice: 32000,
+    discountPercent: 30,
+    discountedPrice: 22400,
     validUntil: '5-oktabr',
   },
 ]
@@ -60,11 +60,11 @@ const scrollCarousel = (direction: 'prev' | 'next') => {
   <div class="discounts">
     <header class="discounts__header">
       <div>
-        <p class="eyebrow">Trio promo aktsiyalari</p>
-        <h1>Eng issiq chegirmalar shu yerda</h1>
+        <p class="eyebrow">Oziq-ovqat do'koni chegirmalari</p>
+        <h1>Eng issiq oziq-ovqat chegirmalari</h1>
         <p class="subtitle">
-          Sevimli mahsulotlaringiz uchun maxsus chegirmalar. Har bir taklif cheklangan muddatda amal qiladi, shuning
-          uchun shoshiling.
+          Kundalik xaridlar uchun maxsus chegirmalar. Har bir taklif cheklangan muddatda amal qiladi, shuning uchun
+          shoshiling.
         </p>
       </div>
       <router-link class="back-button" to="/">
@@ -74,9 +74,9 @@ const scrollCarousel = (direction: 'prev' | 'next') => {
 
     <section class="highlight">
       <div>
-        <h2>Chegirma foizlari 20% dan 35% gacha</h2>
+        <h2>Chegirma foizlari 15% dan 30% gacha</h2>
         <p>
-          Hozircha statik ma'lumotlar asosida. Tez orada backend orqali real vaqtli aktsiyalarni ham ulaymiz.
+          Bu oddiy chegirma takliflari — promokod talab qilinmaydi. Hozircha statik ma'lumotlar asosida.
         </p>
       </div>
       <div class="highlight__stat">
@@ -87,7 +87,7 @@ const scrollCarousel = (direction: 'prev' | 'next') => {
 
     <section class="carousel">
       <div class="carousel__header">
-        <h2>Aktsiyadagi mahsulotlar</h2>
+        <h2>Chegirmadagi mahsulotlar</h2>
         <div class="carousel__controls">
           <button class="carousel__button" type="button" @click="scrollCarousel('prev')">
             ⟵ Oldingi
@@ -112,7 +112,7 @@ const scrollCarousel = (direction: 'prev' | 'next') => {
               <span class="discounted">{{ formatPrice(product.discountedPrice) }}</span>
             </div>
             <div class="promo-callout">
-              <span>Chegirma faqat promo kodi bilan</span>
+              <span>Chegirma har bir xaridor uchun amal qiladi</span>
             </div>
           </div>
         </article>

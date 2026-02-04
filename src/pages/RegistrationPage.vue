@@ -141,15 +141,9 @@ const handleSubmit = async () => {
         </div>
       </header>
 
-      <section class="promo-link">
-        <div>
-          <h2>Aktsiyadagi mahsulotlarni ko'ring</h2>
-          <p>Chegirmadagi mahsulotlar, foizlar va amal qilish muddatlari bilan tanishing.</p>
-        </div>
-        <router-link class="promo-link__button" to="/discounts">
-          Aktsiyalar sahifasi
-        </router-link>
-      </section>
+      <router-link class="discounts-button" to="/discounts">
+        Chegirmadagi mahsulotlar
+      </router-link>
 
       <form class="form" @submit.prevent="handleSubmit">
         <label class="field">
@@ -222,6 +216,7 @@ const handleSubmit = async () => {
   gap: 24px;
   border: 1px solid rgba(79, 70, 229, 0.12);
   backdrop-filter: blur(12px);
+  position: relative;
 }
 
 .card__header {
@@ -255,44 +250,40 @@ h1 {
   gap: 16px;
 }
 
-.promo-link {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 18px;
-  border-radius: 20px;
-  background: linear-gradient(135deg, rgba(79, 70, 229, 0.1), rgba(129, 140, 248, 0.15));
-  border: 1px solid rgba(79, 70, 229, 0.18);
-}
-
-.promo-link h2 {
-  font-size: 18px;
-  color: #1e1b4b;
-}
-
-.promo-link p {
-  margin-top: 6px;
-  color: #475569;
-  font-size: 14px;
-  line-height: 1.5;
-}
-
-.promo-link__button {
-  padding: 10px 16px;
+.discounts-button {
+  position: absolute;
+  top: 28px;
+  right: 28px;
+  padding: 8px 14px;
   border-radius: 999px;
   background: #ffffff;
   color: #4338ca;
   font-weight: 700;
   text-decoration: none;
-  border: 1px solid rgba(79, 70, 229, 0.3);
+  border: 1px solid rgba(79, 70, 229, 0.35);
   white-space: nowrap;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 16px 30px rgba(79, 70, 229, 0.18);
+  transform-origin: center;
+  animation: discountsPulse 2s ease-out forwards;
 }
 
-.promo-link__button:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 12px 24px rgba(79, 70, 229, 0.2);
+.discounts-button:hover {
+  transform: translateY(-1px) scale(1.02);
+  box-shadow: 0 18px 36px rgba(79, 70, 229, 0.24);
+}
+
+@keyframes discountsPulse {
+  0% {
+    transform: scale(1.18);
+    box-shadow: 0 20px 42px rgba(79, 70, 229, 0.3);
+  }
+  60% {
+    transform: scale(1.04);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 16px 30px rgba(79, 70, 229, 0.18);
+  }
 }
 
 .field {
@@ -401,9 +392,11 @@ h1 {
     padding: 28px 22px;
   }
 
-  .promo-link {
-    flex-direction: column;
-    align-items: flex-start;
+  .discounts-button {
+    top: 18px;
+    right: 18px;
+    padding: 6px 12px;
+    font-size: 13px;
   }
 
   .logo {
