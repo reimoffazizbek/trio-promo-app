@@ -195,6 +195,12 @@ const handleSubmit = async () => {
     isSubmitting.value = false
   }
 }
+
+const onPromoInput = (e) => {
+  formState.value.promoCode = e.target.value
+      .toUpperCase()
+      .replace(/[^A-Z0-9]/g, '')
+}
 </script>
 
 <template>
@@ -236,11 +242,14 @@ const handleSubmit = async () => {
         <label class="field">
           <span>Promocode</span>
           <input
-            v-model="formState.promoCode"
-            type="text"
-            placeholder="6 ta belgidan iborat"
-            maxlength="6"
-            autocapitalize="characters"
+              v-model="formState.promoCode"
+              type="text"
+              placeholder="6 ta belgidan iborat"
+              maxlength="6"
+              autocapitalize="characters"
+              inputmode="text"
+              pattern="[A-Z0-9]*"
+              @input="onPromoInput"
           />
         </label>
 
