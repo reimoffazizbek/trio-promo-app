@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-
 const products = [
   {
     id: 1,
@@ -9,7 +7,7 @@ const products = [
     originalPrice: 18500,
     discountPercent: 20,
     discountedPrice: 14800,
-    validUntil: '30-sentabr',
+    deadline: '2025-09-30',
   },
   {
     id: 2,
@@ -18,7 +16,7 @@ const products = [
     originalPrice: 42000,
     discountPercent: 15,
     discountedPrice: 35700,
-    validUntil: '28-sentabr',
+    deadline: '2025-09-28',
   },
   {
     id: 3,
@@ -27,7 +25,7 @@ const products = [
     originalPrice: 98000,
     discountPercent: 25,
     discountedPrice: 73500,
-    validUntil: '18-sentabr',
+    deadline: '2025-09-18',
   },
   {
     id: 4,
@@ -36,23 +34,30 @@ const products = [
     originalPrice: 32000,
     discountPercent: 30,
     discountedPrice: 22400,
-    validUntil: '5-oktabr',
+    deadline: '2025-10-05',
   },
 ]
 
-const carouselRef = ref<HTMLDivElement | null>(null)
-
 const formatPrice = (value: number) => `${value.toLocaleString('uz-UZ')} so'm`
 
-const scrollCarousel = (direction: 'prev' | 'next') => {
-  const container = carouselRef.value
-  if (!container) return
-
-  const scrollAmount = container.clientWidth * 0.9
-  container.scrollBy({
-    left: direction === 'next' ? scrollAmount : -scrollAmount,
-    behavior: 'smooth',
+const formatDate = (value: string) =>
+  new Date(value).toLocaleDateString('uz-UZ', {
+    day: 'numeric',
+    month: 'long',
   })
+
+const getCountdown = (value: string) => {
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const deadline = new Date(value)
+  deadline.setHours(0, 0, 0, 0)
+
+  const diffDays = Math.ceil((deadline.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
+
+  if (diffDays > 1) return `${diffDays} kun qoldi`
+  if (diffDays === 1) return '1 kun qoldi'
+  if (diffDays === 0) return 'Bugun tugaydi'
+  return 'Muddati tugagan'
 }
 </script>
 
@@ -88,17 +93,9 @@ const scrollCarousel = (direction: 'prev' | 'next') => {
     <section class="carousel">
       <div class="carousel__header">
         <h2>Chegirmadagi mahsulotlar</h2>
-        <div class="carousel__controls">
-          <button class="carousel__button" type="button" @click="scrollCarousel('prev')">
-            ⟵ Oldingi
-          </button>
-          <button class="carousel__button" type="button" @click="scrollCarousel('next')">
-            Keyingi ⟶
-          </button>
-        </div>
       </div>
 
-      <div ref="carouselRef" class="carousel__track">
+      <div class="carousel__track">
         <article v-for="product in products" :key="product.id" class="product-card">
           <div class="product-card__image">
             <img :src="product.image" :alt="product.name" loading="lazy" />
@@ -106,13 +103,15 @@ const scrollCarousel = (direction: 'prev' | 'next') => {
           </div>
           <div class="product-card__body">
             <h3>{{ product.name }}</h3>
-            <p class="validity">Amal qilish muddati: {{ product.validUntil }}</p>
+            <p class="validity">
+              Deadline: {{ formatDate(product.deadline) }} · {{ getCountdown(product.deadline) }}
+            </p>
             <div class="prices">
               <span class="original">{{ formatPrice(product.originalPrice) }}</span>
               <span class="discounted">{{ formatPrice(product.discountedPrice) }}</span>
             </div>
             <div class="promo-callout">
-              <span>Chegirma har bir xaridor uchun amal qiladi</span>
+              <span>Taklif cheklangan miqdorda mavjud</span>
             </div>
           </div>
         </article>
@@ -238,50 +237,11 @@ h1 {
   color: #111827;
 }
 
-.carousel__controls {
-  display: flex;
-  gap: 12px;
-}
-
-.carousel__button {
-  padding: 10px 16px;
-  border-radius: 999px;
-  border: 1px solid rgba(79, 70, 229, 0.3);
-  background: #ffffff;
-  color: #4338ca;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
-}
-
-.carousel__button:hover {
-  background: #4338ca;
-  color: #ffffff;
-  transform: translateY(-1px);
-}
-
 .carousel__track {
   display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: minmax(240px, 320px);
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 20px;
-  overflow-x: auto;
   padding-bottom: 12px;
-  scroll-snap-type: x mandatory;
-}
-
-.carousel__track::-webkit-scrollbar {
-  height: 8px;
-}
-
-.carousel__track::-webkit-scrollbar-track {
-  background: rgba(79, 70, 229, 0.1);
-  border-radius: 999px;
-}
-
-.carousel__track::-webkit-scrollbar-thumb {
-  background: rgba(79, 70, 229, 0.4);
-  border-radius: 999px;
 }
 
 .product-card {
@@ -290,7 +250,6 @@ h1 {
   overflow: hidden;
   box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
   border: 1px solid rgba(79, 70, 229, 0.12);
-  scroll-snap-align: start;
   display: grid;
   min-height: 420px;
 }
@@ -379,9 +338,5 @@ h1 {
     padding: 18px;
   }
 
-  .carousel__controls {
-    width: 100%;
-    justify-content: flex-start;
-  }
 }
 </style>
