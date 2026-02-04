@@ -1,4 +1,5 @@
 import axios, { type AxiosError, type AxiosInstance } from 'axios'
+import router from '../router'
 import { useAuthStore } from '../stores/auth'
 import type { ApiErrorResponse, ApiResponse } from '../types/api'
 
@@ -58,6 +59,21 @@ apiClient.interceptors.response.use(
     return response
   },
   (error: AxiosError<ApiErrorResponse>) => {
+    if (error.response?.status === 401) {
+      const authStore = useAuthStore()
+      authStore.clearAuth()
+
+      const currentRoute = router.currentRoute.value
+      if (currentRoute.path !== '/service/login') {
+        void router.replace({
+          path: '/service/login',
+          query: {
+            redirect: currentRoute.fullPath,
+          },
+        })
+      }
+    }
+
     const payload = error.response?.data
     return Promise.reject(createApiError(payload))
   },
