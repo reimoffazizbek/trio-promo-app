@@ -3,7 +3,7 @@ import type { ApiResponse, PromoRegistrationPayload, PromoRegistrationResult } f
 
 export const promoService = {
   async registerPromo(payload: PromoRegistrationPayload) {
-    const response = await apiClient.post<ApiResponse<PromoRegistrationResult>>('/promo/register', payload)
+    const response = await apiClient.post<ApiResponse<PromoRegistrationResult>>('/promo/registration', payload)
     return response.data
   },
 }

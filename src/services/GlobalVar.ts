@@ -27,7 +27,7 @@ const createApiError = (payload?: ApiErrorResponse | ApiResponse<unknown>) => {
 }
 
 export const apiClient: AxiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL ?? 'https://api-promo.mytrio.uz',
+  baseURL: import.meta.env.VITE_BACKEND_URL ?? 'https://api-promo.mytrio.uz',
   timeout: 15000,
   headers: {
     'Content-Type': 'application/json',

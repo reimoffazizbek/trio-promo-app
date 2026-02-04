@@ -8,7 +8,6 @@ const PHONE_PREFIX = '+998 '
 
 const createFormState = () => ({
   firstName: '',
-  lastName: '',
   phone: PHONE_PREFIX,
   promoCode: '',
 })
@@ -82,11 +81,10 @@ const handlePhoneKeydown = (event: KeyboardEvent) => {
 }
 
 const isFormValid = computed(() => {
-  const { firstName, lastName, phone, promoCode } = formState.value
+  const { firstName, phone, promoCode } = formState.value
   const digitCount = phone.replace(/\D/g, '').length
   return (
     firstName.trim().length > 0 &&
-    lastName.trim().length > 0 &&
     digitCount === 12 &&
     promoCode.trim().length === 6
   )
@@ -110,9 +108,8 @@ const handleSubmit = async () => {
   isSubmitting.value = true
 
   const payload: PromoRegistrationPayload = {
-    firstName: formState.value.firstName.trim(),
-    lastName: formState.value.lastName.trim(),
-    phoneNumber: formState.value.phone.trim(),
+    fullName: formState.value.firstName.trim(),
+    phone: formState.value.phone.trim().replace(/[()\s-]/g, ''),
     promoCode: formState.value.promoCode.trim(),
   }
 
@@ -148,11 +145,6 @@ const handleSubmit = async () => {
         <label class="field">
           <span>Ism</span>
           <input v-model="formState.firstName" type="text" placeholder="Ismingiz" autocomplete="given-name" />
-        </label>
-
-        <label class="field">
-          <span>Familiya</span>
-          <input v-model="formState.lastName" type="text" placeholder="Familiyangiz" autocomplete="family-name" />
         </label>
 
         <label class="field">
