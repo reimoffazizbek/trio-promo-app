@@ -5,7 +5,6 @@ const PHONE_PREFIX = '+998 '
 
 const createFormState = () => ({
   firstName: '',
-  lastName: '',
   phone: PHONE_PREFIX,
   promoCode: '',
 })
@@ -79,11 +78,10 @@ const handlePhoneKeydown = (event: KeyboardEvent) => {
 }
 
 const isFormValid = computed(() => {
-  const { firstName, lastName, phone, promoCode } = formState.value
+  const { firstName, phone, promoCode } = formState.value
   const digitCount = phone.replace(/\D/g, '').length
   return (
     firstName.trim().length > 0 &&
-    lastName.trim().length > 0 &&
     digitCount === 12 &&
     promoCode.trim().length === 6
   )
@@ -104,9 +102,10 @@ const handleSubmit = async () => {
     return
   }
 
-  const endpoint = import.meta.env.VITE_SHEETS_WEBAPP_URL as string | undefined
+  const backendUrl = import.meta.env.VITE_BACKEND_URL as string | undefined
 
-  if (!endpoint) {
+  console.log(backendUrl)
+  if (!backendUrl) {
     statusType.value = 'error'
     statusMessage.value = 'Server manzili sozlanmagan. Administrator bilan bog\'laning.'
     return
@@ -115,18 +114,16 @@ const handleSubmit = async () => {
   isSubmitting.value = true
 
   const payload = {
-    firstName: formState.value.firstName.trim(),
-    lastName: formState.value.lastName.trim(),
-    phone: formState.value.phone.trim(),
+    fullName: formState.value.firstName.trim(),
+    phone: formState.value.phone.trim().replace(/[()\s-]/g, ''),
     promoCode: formState.value.promoCode.trim(),
   }
 
   try {
-    const response = await fetch(endpoint, {
+    const response = await fetch(backendUrl + 'promo/registration', {
       method: 'POST',
-      redirect: 'follow',
       headers: {
-        'Content-Type': 'text/plain;charset=utf-8',
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify(payload),
     }).then((res) => res.json())
@@ -167,11 +164,6 @@ const handleSubmit = async () => {
         <label class="field">
           <span>Ism</span>
           <input v-model="formState.firstName" type="text" placeholder="Ismingiz" autocomplete="given-name" />
-        </label>
-
-        <label class="field">
-          <span>Familiya</span>
-          <input v-model="formState.lastName" type="text" placeholder="Familiyangiz" autocomplete="family-name" />
         </label>
 
         <label class="field">

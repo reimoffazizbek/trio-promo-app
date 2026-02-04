@@ -12,6 +12,7 @@ node_modules
 .DS_Store
 html
 dist
+trio-promo
 dist-ssr
 coverage
 *.local
