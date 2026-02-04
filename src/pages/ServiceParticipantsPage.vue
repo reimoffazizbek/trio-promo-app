@@ -131,7 +131,7 @@ onBeforeUnmount(() => {
             </tr>
             <template v-else>
               <tr v-for="(participant, index) in participants" :key="participant.id">
-                <td>{{ (currentPage - 1) * pageSize + index + 1 }}</td>
+                <td>{{ totalElements - ((currentPage - 1) * pageSize + index) }}</td>
                 <td>{{ participant.fullName }}</td>
                 <td>{{ participant.phoneNumber }}</td>
                 <td class="code">{{ participant.promoCode }}</td>
