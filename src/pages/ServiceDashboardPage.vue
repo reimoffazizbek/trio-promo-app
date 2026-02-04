@@ -6,6 +6,7 @@ import { participantService } from '../services/participantService'
 import { useAuthStore } from '../stores/auth'
 import ServiceLayout from '../components/ServiceLayout.vue'
 import type { ParticipantItem, TopParticipant } from '../types/api'
+import {formatDate} from "@/services/GlobalVar.ts";
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -110,7 +111,7 @@ onMounted(() => {
                 <td>{{ getDescendingIndex(latestParticipants.length, index) }}</td>
                 <td>{{ participant.fullName }}</td>
                 <td>{{ participant.phoneNumber }}</td>
-                <td>{{ participant.createdAt || participant.createdDate || '-' }}</td>
+                <td>{{ formatDate(participant.createdAt) || formatDate(participant.createdDate) || '-' }}</td>
               </tr>
             </tbody>
           </table>
@@ -135,6 +136,7 @@ onMounted(() => {
   box-shadow: 0 18px 40px rgba(15, 23, 42, 0.06);
   display: grid;
   gap: 16px;
+  height: min-content;
 }
 
 .panel__header h2 {

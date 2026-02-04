@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import RegistrationPage from '../pages/RegistrationPage.vue'
-import DiscountsPage from '../pages/DiscountsPage.vue'
+// import DiscountsPage from '../pages/DiscountsPage.vue'
 import ServiceLoginPage from '../pages/ServiceLoginPage.vue'
 import ServiceDashboardPage from '../pages/ServiceDashboardPage.vue'
 import ServicePromocodesPage from '../pages/ServicePromocodesPage.vue'
@@ -15,11 +15,11 @@ const router = createRouter({
       name: 'registration',
       component: RegistrationPage,
     },
-    {
-      path: '/discounts',
-      name: 'discounts',
-      component: DiscountsPage,
-    },
+    // {
+    //   path: '/discounts',
+    //   name: 'discounts',
+    //   component: DiscountsPage,
+    // },
     {
       path: '/service/login',
       name: 'service-login',

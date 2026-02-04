@@ -8,7 +8,7 @@ export type AdminLoginPayload = {
 
 export const adminAuthService = {
   async login(payload: AdminLoginPayload) {
-    const response = await apiClient.post<ApiResponse<AuthPayload>>('/auth/login', payload)
+    const response = await apiClient.post<ApiResponse<AuthPayload>>('/auth/sign-in', payload)
     return response.data
   },
 }

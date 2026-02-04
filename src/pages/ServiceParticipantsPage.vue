@@ -5,6 +5,7 @@ import { authService } from '../services/authService'
 import { participantService } from '../services/participantService'
 import ServiceLayout from '../components/ServiceLayout.vue'
 import type { ParticipantItem } from '../types/api'
+import {formatDate} from "../services/GlobalVar.ts";
 
 const router = useRouter()
 
@@ -120,6 +121,7 @@ onBeforeUnmount(() => {
               <th>Ism</th>
               <th>Telefon raqam</th>
               <th>Promokod</th>
+              <th>Ro'yxatdan o'tgan vaqt</th>
             </tr>
           </thead>
           <tbody>
@@ -135,6 +137,7 @@ onBeforeUnmount(() => {
                 <td>{{ participant.fullName }}</td>
                 <td>{{ participant.phoneNumber }}</td>
                 <td class="code">{{ participant.promoCode }}</td>
+                <td>{{ formatDate(participant.createdAt) }}</td>
               </tr>
             </template>
           </tbody>

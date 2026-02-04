@@ -70,3 +70,23 @@ export const getApiErrorMessage = (error: unknown) => {
 
   return "Server bilan bog'lanishda xatolik yuz berdi."
 }
+
+export function formatDate(dateInput: string | Date): string {
+  const date = new Date(dateInput);
+  if (isNaN(date.getTime())) {
+    throw new Error("Invalid date");
+  }
+
+  const pad = (n: number) => n.toString().padStart(2, '0');
+
+  const day = pad(date.getDate());
+  const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const month = monthNames[date.getMonth()];
+  const year = date.getFullYear();
+
+  const hours = pad(date.getHours());
+  const minutes = pad(date.getMinutes());
+  const seconds = pad(date.getSeconds());
+
+  return `${day} ${month} ${year} ${hours}:${minutes}:${seconds}`;
+}

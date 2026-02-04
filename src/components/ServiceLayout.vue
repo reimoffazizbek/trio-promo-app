@@ -32,7 +32,7 @@ watch(
     <aside class="service-sidebar" :class="{ 'service-sidebar--open': isSidebarOpen }">
       <div class="sidebar-header">
         <div class="brand">
-          <span class="brand__mark">TP</span>
+          <img src="/public/logo.svg" alt="logo" style="width: 45px; height: 45px;"/>
           <div>
             <p class="brand__title">Trio Promo</p>
             <p class="brand__subtitle">Admin panel</p>
@@ -50,7 +50,7 @@ watch(
         <p class="footer-label">Tezkor menyu</p>
         <div class="footer-links">
           <router-link class="footer-link" to="/">Ro'yxatdan o'tish</router-link>
-          <router-link class="footer-link" to="/discounts">Chegirmalar</router-link>
+<!--          <router-link class="footer-link" to="/discounts">Chegirmalar</router-link>-->
         </div>
       </div>
     </aside>
@@ -193,6 +193,7 @@ watch(
   padding: 32px 40px 48px;
   display: grid;
   gap: 28px;
+  height: min-content;
 }
 
 .service-topbar {
@@ -295,6 +296,7 @@ h1 {
 
   .service-main {
     padding: 24px;
+    height: min-content;
   }
 
   .service-topbar {
@@ -314,6 +316,7 @@ h1 {
 @media (max-width: 640px) {
   .service-main {
     padding: 20px 16px 32px;
+    height: min-content;
   }
 
   h1 {

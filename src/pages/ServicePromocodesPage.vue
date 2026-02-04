@@ -215,6 +215,7 @@ onBeforeUnmount(() => {
   gap: 12px;
   align-items: center;
   justify-content: space-between;
+  height: fit-content;
 }
 
 .panel__header h2 {

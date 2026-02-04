@@ -141,9 +141,9 @@ const handleSubmit = async () => {
         </div>
       </header>
 
-      <router-link class="discounts-button" to="/discounts">
-        Chegirmadagi mahsulotlar
-      </router-link>
+<!--      <router-link class="discounts-button" to="/discounts">-->
+<!--        Chegirmadagi mahsulotlar-->
+<!--      </router-link>-->
 
       <form class="form" @submit.prevent="handleSubmit">
         <label class="field">
