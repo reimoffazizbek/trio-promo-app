@@ -197,7 +197,9 @@ const handleSubmit = async () => {
 }
 
 const onPromoInput = (e: Event) => {
-  formState.value.promoCode = e.target.value
+  const target = e.target as HTMLInputElement
+
+  formState.value.promoCode = target.value
       .toUpperCase()
       .replace(/[^A-Z0-9]/g, '')
 }
