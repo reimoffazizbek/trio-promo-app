@@ -69,6 +69,15 @@ export type ParticipantItem = {
   fullName: string
   phoneNumber: string
   promoCode: string
+  createdAt?: string
+  createdDate?: string
+}
+
+export type TopParticipant = {
+  id: number
+  fullName: string
+  phoneNumber: string
+  totalRegistrationCount: number
 }
 
 export type PagedResponse<T> = {

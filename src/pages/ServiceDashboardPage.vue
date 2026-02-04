@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { authService } from '../services/authService'
+import { participantService } from '../services/participantService'
 import { useAuthStore } from '../stores/auth'
 import ServiceLayout from '../components/ServiceLayout.vue'
+import type { ParticipantItem, TopParticipant } from '../types/api'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -16,31 +18,34 @@ const userName = computed(() => {
   return [user.firstName, user.lastName].filter(Boolean).join(' ') || user.phoneNumber || 'Admin'
 })
 
-const topParticipants = [
-  { name: 'Azizbek Karimov', phone: '+998 90 123 45 67', registrations: 12 },
-  { name: 'Dilnoza Ahmedova', phone: '+998 91 234 56 78', registrations: 10 },
-  { name: 'Bekzod Rustamov', phone: '+998 93 345 67 89', registrations: 9 },
-  { name: 'Madina Islomova', phone: '+998 94 456 78 90', registrations: 8 },
-  { name: 'Javohir Xasanov', phone: '+998 95 567 89 01', registrations: 7 },
-]
+const topParticipants = ref<TopParticipant[]>([])
+const latestParticipants = ref<ParticipantItem[]>([])
 
-const latestParticipants = [
-  { name: 'Umida Abdullayeva', phone: '+998 90 321 45 67', date: '2024-06-14 10:12' },
-  { name: 'Sherzod Qodirov', phone: '+998 91 654 32 10', date: '2024-06-14 09:40' },
-  { name: 'Nodira Usmonova', phone: '+998 93 111 22 33', date: '2024-06-14 09:10' },
-  { name: 'Farruh Xasanov', phone: '+998 94 222 33 44', date: '2024-06-14 08:55' },
-  { name: 'Kamola Rustamova', phone: '+998 95 333 44 55', date: '2024-06-14 08:20' },
-  { name: 'Yusuf Karimov', phone: '+998 90 444 55 66', date: '2024-06-14 08:05' },
-  { name: 'Lola Tursunova', phone: '+998 91 555 66 77', date: '2024-06-14 07:40' },
-  { name: 'Akmal Mirzayev', phone: '+998 93 666 77 88', date: '2024-06-14 07:15' },
-  { name: 'Nigora Shavkatova', phone: '+998 94 777 88 99', date: '2024-06-14 06:50' },
-  { name: 'Sardor Usmonov', phone: '+998 95 888 99 00', date: '2024-06-14 06:25' },
-]
+const fetchTopParticipants = async () => {
+  const response = await participantService.findTopParticipants()
+  topParticipants.value = response.data
+}
+
+const fetchLatestParticipants = async () => {
+  const response = await participantService.findAll({
+    page: 0,
+    size: 10,
+    search: null,
+  })
+  latestParticipants.value = response.data.content
+}
+
+const getDescendingIndex = (total: number, index: number) => total - index
 
 const handleLogout = async () => {
   authService.clearSession()
   await router.push('/service/login')
 }
+
+onMounted(() => {
+  void fetchTopParticipants()
+  void fetchLatestParticipants()
+})
 </script>
 
 <template>
@@ -72,11 +77,11 @@ const handleLogout = async () => {
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(participant, index) in topParticipants" :key="participant.phone">
-                <td>{{ index + 1 }}</td>
-                <td>{{ participant.name }}</td>
-                <td>{{ participant.phone }}</td>
-                <td class="highlight">{{ participant.registrations }}</td>
+              <tr v-for="(participant, index) in topParticipants" :key="participant.id">
+                <td>{{ getDescendingIndex(topParticipants.length, index) }}</td>
+                <td>{{ participant.fullName }}</td>
+                <td>{{ participant.phoneNumber }}</td>
+                <td class="highlight">{{ participant.totalRegistrationCount }}</td>
               </tr>
             </tbody>
           </table>
@@ -101,11 +106,11 @@ const handleLogout = async () => {
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(participant, index) in latestParticipants" :key="participant.phone">
-                <td>{{ index + 1 }}</td>
-                <td>{{ participant.name }}</td>
-                <td>{{ participant.phone }}</td>
-                <td>{{ participant.date }}</td>
+              <tr v-for="(participant, index) in latestParticipants" :key="participant.id">
+                <td>{{ getDescendingIndex(latestParticipants.length, index) }}</td>
+                <td>{{ participant.fullName }}</td>
+                <td>{{ participant.phoneNumber }}</td>
+                <td>{{ participant.createdAt || participant.createdDate || '-' }}</td>
               </tr>
             </tbody>
           </table>
