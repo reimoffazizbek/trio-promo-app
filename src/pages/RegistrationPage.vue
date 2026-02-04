@@ -189,8 +189,8 @@ const handleSubmit = async () => {
         <h2>Biz bilan bog'laning</h2>
         <p>Savol yoki xatolik bo'lsa, tezkor yordam uchun yozing.</p>
         <div class="contact__items">
-          <a class="contact__item" href="https://t.me/reimoffazizbek" target="_blank" rel="noopener">@reimoffazizbek</a>
-          <a class="contact__item" href="tel:+998904217300">+998 90 421 73 00</a>
+          <a class="contact__item" href="https://t.me/reimoffazizbek" target="_blank" rel="noopener"><img src="/public/Telegram%20logo.webp" alt="telegram:" style="height: 30px; width: 30px"> @reimoffazizbek</a>
+          <a class="contact__item" href="tel:+998904217300"><img src="/public/telephone_260e-fe0f.webp" alt="phone" style="height: 20px; width: 20px">+998 90 421 73 00</a>
         </div>
       </div>
     </main>
@@ -381,6 +381,10 @@ h1 {
   font-weight: 600;
   font-size: 14px;
   text-decoration: none;
+  display: flex;
+  gap: 5px;
+  justify-content: center;
+  align-items: center;
 }
 
 .contact__item:hover {
