@@ -60,7 +60,7 @@ const normalizePhone = (value: string) => {
 const countDigitsBefore = (value: string, position: number) => {
   let count = 0
   for (let i = 0; i < position; i += 1) {
-    if (/\d/.test(value[i])) {
+    if (/\d/.test(value[i] || "")) {
       count += 1
     }
   }
@@ -86,7 +86,7 @@ const getCaretPositionForLocalIndex = (value: string, localIndex: number) => {
   let count = 0
 
   for (let i = 0; i < value.length; i += 1) {
-    if (/\d/.test(value[i])) {
+    if (/\d/.test(value[i] || "")) {
       count += 1
       if (count === targetDigitCount) {
         return i + 1
